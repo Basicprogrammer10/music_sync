@@ -1,0 +1,10 @@
+[source]
+platform = "spotify"
+playlists = [
+    "...",
+    "liked_songs"
+]
+
+[drain]
+platform = "apple_music"
+create_playlist = true
