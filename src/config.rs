@@ -32,7 +32,7 @@ pub mod platform {
     use crate::{
         app::App,
         platform::{
-            spotify::{SpotifyLogin, SpotifyToken},
+            spotify::{login::SpotifyLogin, token::SpotifyToken},
             Platform,
         },
     };
@@ -78,8 +78,12 @@ pub mod platform {
                     } => Box::new(SpotifyLogin {
                         client_id,
                         client_secret,
+                        app: app.clone(),
                     }),
-                    PlatformConfig::SpotifyToken { token } => Box::new(SpotifyToken { token }),
+                    PlatformConfig::SpotifyToken { token } => Box::new(SpotifyToken {
+                        token,
+                        app: app.clone(),
+                    }),
                 };
 
                 platforms.insert(key.to_ascii_lowercase(), platform);
