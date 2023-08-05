@@ -2,6 +2,8 @@ use std::fmt::{self, Display};
 
 use serde::Deserialize;
 
+pub mod spotify;
+
 #[derive(Deserialize, Debug, Clone, Copy)]
 #[serde(rename_all = "snake_case")]
 pub enum Platforms {
@@ -9,19 +11,12 @@ pub enum Platforms {
     AppleMusic,
 }
 
-#[derive(Deserialize, Debug)]
-#[serde(tag = "type", rename_all = "kebab-case")]
-pub enum PlatformConfig {
-    #[serde(rename_all = "kebab-case")]
-    SpotifyLogin {
-        client_id: String,
-        client_secret: String,
-    },
-    #[serde(rename_all = "kebab-case")]
-    SpotifyToken { token: String },
+pub trait Platform {
+    fn name(&self) -> &'static str;
+    fn sub_type(&self) -> &'static str {
+        ""
+    }
 }
-
-trait Platform {}
 
 impl Display for Platforms {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {

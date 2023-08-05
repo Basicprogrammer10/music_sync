@@ -27,6 +27,7 @@ impl App {
 
         let raw_platform = fs::read_to_string(&args.platform_config)?;
         let platform = PlatformConfigs::parse(&raw_platform)?;
+        dbg!(&platform);
 
         let raw_config = fs::read_to_string(args.config)?;
         let config = toml::from_str::<Config>(&raw_config)?;
@@ -50,5 +51,9 @@ impl App {
             database,
             config,
         })
+    }
+
+    pub fn validate_tokens(&self) {
+
     }
 }
