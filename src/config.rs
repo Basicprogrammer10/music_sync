@@ -23,27 +23,58 @@ pub mod config {
 }
 
 pub mod platform {
+    use eyre::{bail, ContextCompat, Result};
+    use hashbrown::HashMap;
     use serde::Deserialize;
+    use toml::Value;
+    use tracing::info;
 
-    use crate::platform::{Platforms, PlatformConfig};
+    use crate::platform::PlatformConfig;
 
     #[derive(Debug)]
     pub struct PlatformConfigs {
-        platforms: Vec<PlatformConfig>
+        platforms: HashMap<String, PlatformConfig>,
     }
 
+    impl PlatformConfigs {
+        pub fn parse(str: &str) -> Result<Self> {
+            let toml: Value = toml::from_str(str)?;
+            let table = toml.as_table().context("Platform config is not a table")?;
+            info!(
+                "Found {} platforms: {}",
+                table.len(),
+                table.keys().cloned().collect::<Vec<_>>().join(", ")
+            );
 
-    pub struct Spotify {
-        pub client_id: String,
-        pub client_secret: String,
+            let mut platforms = HashMap::new();
+
+            for (key, value) in table {
+                let platform = PlatformConfig::deserialize(value.to_owned())?;
+
+                if platforms.contains_key(key) {
+                    bail!("Duplicate platform identifier");
+                }
+
+                platforms.insert(key.to_ascii_lowercase(), platform);
+            }
+
+            Ok(Self { platforms })
+        }
+
+        pub fn supports(&self, id: &str) -> bool {
+            self.platforms.contains_key(&id.to_ascii_lowercase())
+        }
     }
-    
-    // impl Platform {
-    //     pub fn supports(&self, platform: Platforms) -> bool {
-    //         match platform {
-    //             Platforms::Spotify => self.spotify.is_some(),
-    //             Platforms::AppleMusic => false
-    //         }
-    //     }
-    // }
 }
+
+/*
+match platform {
+                Platforms::Spotify => self.platforms.values().any(|x| {
+                    matches!(
+                        x,
+                        PlatformConfig::SpotifyLogin { .. } | PlatformConfig::SpotifyToken { .. }
+                    )
+                }),
+                Platforms::AppleMusic => false,
+            }
+*/

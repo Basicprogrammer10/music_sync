@@ -1,4 +1,4 @@
-use anyhow::Result;
+use eyre::Result;
 use parking_lot::{
     MappedRwLockReadGuard, MappedRwLockWriteGuard, RwLock, RwLockReadGuard, RwLockWriteGuard,
 };

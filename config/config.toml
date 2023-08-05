@@ -7,3 +7,4 @@ playlists = [
 
 [drain]
 platform = "spotify_alt"
+create_playlist = true
