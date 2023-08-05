@@ -1,3 +1,9 @@
-[spotify]
+[spotify_main]
+type = "spotify-login"
+client-id = ""
+client-secret = ""
+
+[spotify_alt]
+type = "spotify-login"
 client-id = ""
 client-secret = ""

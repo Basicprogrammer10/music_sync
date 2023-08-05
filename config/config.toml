@@ -1,10 +1,9 @@
 [source]
-platform = "spotify"
+platform = "spotify_main"
 playlists = [
     "...",
     "liked_songs"
 ]
 
 [drain]
-platform = "apple_music"
-create_playlist = true
+platform = "spotify_alt"
