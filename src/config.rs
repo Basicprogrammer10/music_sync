@@ -1,8 +1,6 @@
 pub mod config {
     use serde::Deserialize;
 
-    use crate::platform::Platforms;
-
     #[derive(Deserialize, Debug)]
     pub struct Config {
         pub source: Source,
@@ -23,17 +21,20 @@ pub mod config {
 }
 
 pub mod platform {
-    use std::fmt::Debug;
+    use std::{fmt::Debug, sync::Arc};
 
     use eyre::{bail, ContextCompat, Result};
-    use hashbrown::{raw, HashMap};
+    use hashbrown::HashMap;
     use serde::Deserialize;
     use toml::Value;
     use tracing::info;
 
-    use crate::platform::{
-        spotify::{SpotifyLogin, SpotifyToken},
-        Platform,
+    use crate::{
+        app::App,
+        platform::{
+            spotify::{SpotifyLogin, SpotifyToken},
+            Platform,
+        },
     };
     pub struct PlatformConfigs {
         platforms: HashMap<String, Box<dyn Platform>>,
@@ -52,7 +53,7 @@ pub mod platform {
     }
 
     impl PlatformConfigs {
-        pub fn parse(str: &str) -> Result<Self> {
+        pub fn parse(str: &str, app: Arc<App>) -> Result<Self> {
             let toml: Value = toml::from_str(str)?;
             let table = toml.as_table().context("Platform config is not a table")?;
             info!(
