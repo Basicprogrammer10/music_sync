@@ -4,14 +4,11 @@ use parking_lot::{
 };
 use rusqlite::Connection;
 
+pub mod spotify;
+use spotify::SpotifyDb;
+
 pub struct Db {
     inner: RwLock<Option<Connection>>,
-}
-
-pub trait Database {
-    // == Base ==
-    fn init(&self) -> Result<()>;
-    fn cleanup(&self) -> Result<()>;
 }
 
 impl Db {
@@ -37,8 +34,8 @@ impl Db {
     }
 }
 
-impl Database for Db {
-    fn init(&self) -> Result<()> {
+impl Db {
+    pub fn init(&self) -> Result<()> {
         let mut this = self.write();
         this.pragma_update(None, "journal_mode", "WAL")?;
         this.pragma_update(None, "synchronous", "NORMAL")?;
@@ -51,10 +48,14 @@ impl Database for Db {
         Ok(())
     }
 
-    fn cleanup(&self) -> Result<()> {
+    pub fn cleanup(&self) -> Result<()> {
         let this = self.take();
         this.pragma_update(None, "wal_checkpoint", "TRUNCATE")?;
         drop(this);
         Ok(())
+    }
+
+    pub fn spotify(&self) -> SpotifyDb {
+        SpotifyDb(self)
     }
 }

@@ -1,5 +1,6 @@
 use std::fmt::{self, Display};
 
+use eyre::Result;
 use serde::Deserialize;
 
 pub mod spotify;
@@ -12,9 +13,15 @@ pub enum Platforms {
 }
 
 pub trait Platform {
+    // == Info ==
     fn name(&self) -> &'static str;
     fn sub_type(&self) -> &'static str {
         ""
+    }
+
+    // == Actions ==
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 

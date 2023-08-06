@@ -9,4 +9,6 @@ pub struct Args {
     pub platform_config: PathBuf,
     #[arg(default_value = "data.db")]
     pub database: PathBuf,
+    #[arg(default_value_t = 8231)]
+    pub oauth_port: u16,
 }

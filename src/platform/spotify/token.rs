@@ -3,6 +3,7 @@ use std::sync::Arc;
 use crate::{app::App, platform::Platform};
 
 pub struct SpotifyToken {
+    pub id: String,
     pub token: String,
     pub app: Arc<App>,
 }

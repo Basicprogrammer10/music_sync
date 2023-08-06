@@ -37,7 +37,7 @@ pub mod platform {
         },
     };
     pub struct PlatformConfigs {
-        platforms: HashMap<String, Box<dyn Platform>>,
+        pub platforms: HashMap<String, Box<dyn Platform>>,
     }
 
     #[derive(Deserialize, Debug)]
@@ -71,22 +71,10 @@ pub mod platform {
                     bail!("Duplicate platform identifier");
                 }
 
-                let platform: Box<dyn Platform> = match raw_platform {
-                    PlatformConfig::SpotifyLogin {
-                        client_id,
-                        client_secret,
-                    } => Box::new(SpotifyLogin {
-                        client_id,
-                        client_secret,
-                        app: app.clone(),
-                    }),
-                    PlatformConfig::SpotifyToken { token } => Box::new(SpotifyToken {
-                        token,
-                        app: app.clone(),
-                    }),
-                };
-
-                platforms.insert(key.to_ascii_lowercase(), platform);
+                platforms.insert(
+                    key.to_ascii_lowercase(),
+                    raw_platform.into_object(key.to_owned(), app.clone()),
+                );
             }
 
             Ok(Self { platforms })
@@ -94,6 +82,27 @@ pub mod platform {
 
         pub fn supports(&self, id: &str) -> bool {
             self.platforms.contains_key(&id.to_ascii_lowercase())
+        }
+    }
+
+    impl PlatformConfig {
+        fn into_object(self, id: String, app: Arc<App>) -> Box<dyn Platform> {
+            match self {
+                PlatformConfig::SpotifyLogin {
+                    client_id,
+                    client_secret,
+                } => Box::new(SpotifyLogin {
+                    client_id,
+                    client_secret,
+                    id: id.to_owned(),
+                    app: app.clone(),
+                }),
+                PlatformConfig::SpotifyToken { token } => Box::new(SpotifyToken {
+                    token,
+                    id: id.to_owned(),
+                    app: app.clone(),
+                }),
+            }
         }
     }
 
@@ -122,15 +131,3 @@ pub mod platform {
         }
     }
 }
-
-/*
-match platform {
-                Platforms::Spotify => self.platforms.values().any(|x| {
-                    matches!(
-                        x,
-                        PlatformConfig::SpotifyLogin { .. } | PlatformConfig::SpotifyToken { .. }
-                    )
-                }),
-                Platforms::AppleMusic => false,
-            }
-*/

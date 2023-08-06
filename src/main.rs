@@ -5,6 +5,7 @@ mod app;
 mod args;
 mod config;
 mod database;
+mod misc;
 mod platform;
 
 fn main() -> Result<()> {
@@ -14,6 +15,8 @@ fn main() -> Result<()> {
         .init();
 
     let app = app::App::new()?;
+    app.validate_tokens()?;
 
+    app.database.cleanup()?;
     Ok(())
 }
